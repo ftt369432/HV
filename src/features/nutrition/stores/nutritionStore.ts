@@ -1,15 +1,59 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { startOfDay } from 'date-fns';
+import { format } from 'date-fns';
 import { Meal, DailyNutrition, NutritionGoals } from '../types';
+
+export interface Recipe {
+  id: string;
+  name: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  prepTime: string;
+  difficulty: string;
+  image: string;
+  tags: string[];
+  ingredients: string[];
+  instructions: string[];
+  isFavorite: boolean;
+}
 
 interface NutritionState {
   dailyLogs: Record<string, DailyNutrition>;
   goals: NutritionGoals;
   getCurrentDayLog: () => DailyNutrition;
-  addMeal: (meal: Omit<Meal, 'id'>) => void;
+  addMeal: (meal: Omit<NutritionState['meals'][0], 'id'>) => void;
   updateGoals: (goals: Partial<NutritionGoals>) => void;
   logWaterIntake: (amount: number) => void;
+  meals: Array<{
+    id: string;
+    name: string;
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+    date: string;
+    time: string;
+  }>;
+  recipes: Recipe[];
+  favorites: string[]; // Recipe IDs
+  dailyGoals: {
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+  };
+  removeMeal: (id: string) => void;
+  addRecipe: (recipe: Omit<Recipe, 'id'>) => void;
+  toggleFavorite: (recipeId: string) => void;
+  updateDailyGoals: (goals: Partial<NutritionState['dailyGoals']>) => void;
+  getDailyMacros: (date: string) => {
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+  };
 }
 
 const defaultGoals: NutritionGoals = {
@@ -39,12 +83,21 @@ export const useNutritionStore = create<NutritionState>()(
     (set, get) => ({
       dailyLogs: {},
       goals: defaultGoals,
+      meals: [],
+      recipes: [],
+      favorites: [],
+      dailyGoals: {
+        calories: 2000,
+        protein: 150,
+        carbs: 250,
+        fat: 65
+      },
 
       getCurrentDayLog: () => {
-        const today = startOfDay(new Date()).toISOString();
+        const today = format(new Date(), 'yyyy-MM-dd');
         const currentLog = get().dailyLogs[today];
         if (!currentLog) {
-          return { ...defaultDayLog, date: new Date() };
+          return { ...defaultDayLog, date: today };
         }
         return {
           ...currentLog,
@@ -52,33 +105,39 @@ export const useNutritionStore = create<NutritionState>()(
         };
       },
 
-      addMeal: (meal) => {
-        const today = startOfDay(new Date()).toISOString();
-        const currentLog = get().getCurrentDayLog();
-        
-        const newMeal = {
-          ...meal,
-          id: Date.now().toString()
-        };
+      addMeal: (meal) => set((state) => ({
+        meals: [...state.meals, { ...meal, id: Date.now().toString(), date: format(new Date(), 'yyyy-MM-dd'), time: format(new Date(), 'HH:mm') }]
+      })),
 
-        const updatedMacros = {
-          protein: currentLog.macros.protein + (meal.macros?.protein || 0),
-          carbs: currentLog.macros.carbs + (meal.macros?.carbs || 0),
-          fat: currentLog.macros.fat + (meal.macros?.fat || 0)
-        };
+      removeMeal: (id) => set((state) => ({
+        meals: state.meals.filter(meal => meal.id !== id)
+      })),
 
-        set((state) => ({
-          dailyLogs: {
-            ...state.dailyLogs,
-            [today]: {
-              ...currentLog,
-              meals: [...currentLog.meals, newMeal],
-              totalCalories: currentLog.totalCalories + meal.calories,
-              macros: updatedMacros
-            }
-          }
-        }));
-      },
+      addRecipe: (recipe) => set((state) => ({
+        recipes: [...state.recipes, { ...recipe, id: Date.now().toString(), isFavorite: false }]
+      })),
+
+      toggleFavorite: (recipeId) => set((state) => ({
+        recipes: state.recipes.map(recipe =>
+          recipe.id === recipeId
+            ? { ...recipe, isFavorite: !recipe.isFavorite }
+            : recipe
+        ),
+        favorites: state.favorites.includes(recipeId)
+          ? state.favorites.filter(id => id !== recipeId)
+          : [...state.favorites, recipeId]
+      })),
+
+      updateDailyGoals: (goals) => set((state) => ({
+        dailyGoals: { ...state.dailyGoals, ...goals }
+      })),
+
+      getDailyMacros: (date) => ({
+        calories: 0,
+        protein: 0,
+        carbs: 0,
+        fat: 0
+      }),
 
       updateGoals: (newGoals) => {
         set((state) => ({
@@ -94,7 +153,7 @@ export const useNutritionStore = create<NutritionState>()(
       },
 
       logWaterIntake: (amount) => {
-        const today = startOfDay(new Date()).toISOString();
+        const today = format(new Date(), 'yyyy-MM-dd');
         const currentLog = get().getCurrentDayLog();
         
         const newIntake = Math.max(0, currentLog.waterIntake + amount);

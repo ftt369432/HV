@@ -1,13 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Edit2, 
-  MessageCircle, 
-  UserPlus, 
-  Calendar, 
-  MapPin, 
-  Heart 
-} from 'lucide-react';
+import { Edit2, MessageCircle, UserPlus, Calendar, MapPin, Heart } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
 
 interface UserProfileProps {
@@ -23,10 +16,10 @@ interface Interest {
 export default function UserProfile({ isOwnProfile = false, userId }: UserProfileProps) {
   const { user } = useAuth();
 
-  // Temporary mock data
+  // Mock data for development
   const profile = {
     name: isOwnProfile ? user?.name : 'Jane Smith',
-    photoURL: isOwnProfile ? user?.photoURL : '/avatars/jane.jpg',
+    photoURL: isOwnProfile ? user?.photoURL : 'https://api.dicebear.com/7.x/avatars/svg?seed=jane',
     location: 'San Francisco, CA',
     joinDate: 'January 2024',
     bio: 'Passionate about mental wellness and mindfulness. Love meditation and yoga.',
@@ -50,12 +43,12 @@ export default function UserProfile({ isOwnProfile = false, userId }: UserProfil
 
       {/* Profile Info */}
       <div className="relative px-6 pb-6">
-        {/* Avatar */}
+        {/* Avatar and Actions */}
         <div className="flex justify-between items-end -mt-12 mb-4">
           <div className="flex items-end space-x-4">
             <img
-              src={profile.photoURL}
-              alt={profile.name}
+              src={profile.photoURL || 'https://api.dicebear.com/7.x/avatars/svg?seed=default'}
+              alt={profile.name || 'Profile'}
               className="w-24 h-24 rounded-full border-4 border-white dark:border-gray-800 object-cover"
             />
             <div>
@@ -69,32 +62,34 @@ export default function UserProfile({ isOwnProfile = false, userId }: UserProfil
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="p-2 bg-white dark:bg-gray-700 rounded-full shadow-sm"
+              className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"
             >
-              <Edit2 className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+              <Edit2 className="h-5 w-5" />
             </motion.button>
           ) : (
             <div className="flex space-x-2">
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="p-2 bg-purple-600 text-white rounded-full shadow-sm"
+                className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
               >
-                <MessageCircle className="h-5 w-5" />
+                <UserPlus className="h-5 w-5" />
+                <span>Connect</span>
               </motion.button>
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="p-2 bg-white dark:bg-gray-700 rounded-full shadow-sm"
+                className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"
               >
-                <UserPlus className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                <MessageCircle className="h-5 w-5" />
               </motion.button>
             </div>
           )}
         </div>
 
-        {/* Info */}
+        {/* Info and Stats */}
         <div className="space-y-4">
+          {/* Location and Join Date */}
           <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
             <div className="flex items-center">
               <MapPin className="h-4 w-4 mr-1" />
@@ -105,30 +100,27 @@ export default function UserProfile({ isOwnProfile = false, userId }: UserProfil
               Joined {profile.joinDate}
             </div>
           </div>
+
+          {/* Bio */}
           <p className="text-gray-600 dark:text-gray-400">
             {profile.bio}
           </p>
-        </div>
 
-        {/* Stats */}
-        <div className="mt-6 grid grid-cols-3 gap-4 border-t border-gray-200 dark:border-gray-700 pt-6">
-          {Object.entries(profile.stats).map(([key, value]) => (
-            <div key={key} className="text-center">
-              <div className="text-xl font-bold text-gray-900 dark:text-white">
-                {value}
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-4 border-t border-gray-200 dark:border-gray-700 pt-4">
+            {Object.entries(profile.stats).map(([key, value]) => (
+              <div key={key} className="text-center">
+                <div className="text-xl font-bold text-gray-900 dark:text-white">
+                  {value}
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-400 capitalize">
+                  {key.replace(/([A-Z])/g, ' $1').trim()}
+                </div>
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400 capitalize">
-                {key.replace(/([A-Z])/g, ' $1').trim()}
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        {/* Interests */}
-        <div className="mt-6">
-          <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">
-            Interests
-          </h3>
+          {/* Interests */}
           <div className="flex flex-wrap gap-2">
             {profile.interests.map((interest) => (
               <div

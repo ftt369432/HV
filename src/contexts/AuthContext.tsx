@@ -30,19 +30,44 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Add test user data
+const TEST_USERS = {
+  admin: {
+    email: 'admin@test.com',
+    password: 'password123',
+    name: 'Admin User',
+    photoURL: 'https://api.dicebear.com/7.x/avatars/svg?seed=admin'
+  },
+  test: {
+    email: 'test@test.com',
+    password: 'password123',
+    name: 'Test User',
+    photoURL: 'https://api.dicebear.com/7.x/avatars/svg?seed=test'
+  }
+};
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Check if there's a test user in localStorage
+    const savedUser = localStorage.getItem('testUser');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+      setIsLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
-        setUser({
+        const user = {
           id: firebaseUser.uid,
           email: firebaseUser.email,
           name: firebaseUser.displayName,
           photoURL: firebaseUser.photoURL
-        });
+        };
+        setUser(user);
       } else {
         setUser(null);
       }
@@ -54,8 +79,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      // Check for test users first
+      const testUser = Object.values(TEST_USERS).find(u => u.email === email);
+      if (testUser && password === testUser.password) {
+        const user = {
+          id: email,
+          email: email,
+          name: testUser.name,
+          photoURL: testUser.photoURL
+        };
+        setUser(user);
+        localStorage.setItem('testUser', JSON.stringify(user));
+        return;
+      }
+
+      // Regular Firebase login
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      const user = {
+        id: result.user.uid,
+        email: result.user.email,
+        name: result.user.displayName,
+        photoURL: result.user.photoURL
+      };
+      setUser(user);
     } catch (error) {
+      console.error('Login error:', error);
       throw new Error('Failed to login');
     }
   };
@@ -71,8 +119,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
+      // Clear test user from localStorage
+      localStorage.removeItem('testUser');
+      setUser(null);
+      
+      // Also sign out from Firebase if needed
       await signOut(auth);
     } catch (error) {
+      console.error('Logout error:', error);
       throw new Error('Failed to logout');
     }
   };

@@ -56,20 +56,20 @@ export default function DashboardPage() {
   const recentActivities: Activity[] = [
     {
       id: '1',
-      type: 'Meditation',
-      duration: '15 mins',
+      type: 'Meditation Session',
+      duration: '15 minutes',
       time: '2 hours ago'
     },
     {
       id: '2',
-      type: 'Mood Check',
-      duration: '5 mins',
+      type: 'Mood Check-in',
+      duration: 'Feeling Great',
       time: '4 hours ago'
     },
     {
       id: '3',
       type: 'Journal Entry',
-      duration: '10 mins',
+      duration: 'Daily Reflection',
       time: '6 hours ago'
     }
   ];
@@ -79,10 +79,10 @@ export default function DashboardPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          Welcome Back!
+          Dashboard
         </h1>
         <p className="mt-2 text-gray-600 dark:text-gray-400">
-          Here's an overview of your wellness journey
+          Welcome back! Here's your wellness overview.
         </p>
       </div>
 
@@ -100,15 +100,15 @@ export default function DashboardPage() {
               className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm"
             >
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className={`p-3 rounded-lg bg-gray-100 dark:bg-gray-900 ${metric.color}`}>
-                    <Icon className="h-6 w-6" />
+                <div className="flex items-center space-x-3">
+                  <div className={`p-2 rounded-lg bg-gray-100 dark:bg-gray-900 ${metric.color}`}>
+                    <Icon className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
                       {metric.label}
                     </p>
-                    <p className="text-xl font-semibold text-gray-900 dark:text-white">
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white">
                       {metric.value}
                     </p>
                   </div>

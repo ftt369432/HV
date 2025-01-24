@@ -23,9 +23,8 @@ export default function AIChat() {
     setMessages(prev => [...prev, userMessage]);
     setIsTyping(true);
 
-    // Generate AI response
-    setTimeout(() => {
-      const response = generateResponse(content);
+    try {
+      const response = await generateResponse(content);
       const aiMessage: Message = {
         id: Date.now() + 1,
         content: response,
@@ -33,36 +32,20 @@ export default function AIChat() {
         timestamp: new Date()
       };
       setMessages(prev => [...prev, aiMessage]);
+    } catch (error) {
+      console.error('Failed to generate response:', error);
+    } finally {
       setIsTyping(false);
-    }, 1000);
+    }
   }, []);
 
   return (
-    <div className="fixed bottom-6 right-6 w-96">
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden 
-                    border border-gray-200 dark:border-gray-700 flex flex-col h-[600px]">
-        {/* Header */}
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex items-center space-x-2">
-            <Bot className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-            <span className="font-medium text-gray-900 dark:text-white">
-              AI Assistant
-            </span>
-          </div>
-        </div>
-
-        {/* Messages */}
-        <ChatMessages 
-          messages={messages}
-          isTyping={isTyping}
-        />
-
-        {/* Suggested Prompts */}
-        {messages.length === 0 && (
-          <SuggestedPrompts onSelect={handleSendMessage} />
-        )}
-
-        {/* Input */}
+    <div className="flex flex-col h-full">
+      <div className="flex-1 overflow-y-auto">
+        <ChatMessages messages={messages} isTyping={isTyping} />
+        {messages.length === 0 && <SuggestedPrompts onSelect={handleSendMessage} />}
+      </div>
+      <div className="p-4 border-t border-gray-200 dark:border-gray-700">
         <ChatInput onSendMessage={handleSendMessage} />
       </div>
     </div>

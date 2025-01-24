@@ -1,0 +1,1 @@
+export { default as NutritionPage } from './NutritionPage'; 

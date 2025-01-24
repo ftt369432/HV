@@ -1,6 +1,9 @@
 /** @type {import('tailwindcss').Config} */
-export default {
-  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+module.exports = {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
   darkMode: 'class',
   theme: {
     extend: {
@@ -28,10 +31,19 @@ export default {
           700: '#047857',
           800: '#065f46',
           900: '#064e3b',
-        }
+        },
+        cyberpunk: {
+          primary: '#FF00FF',
+          secondary: '#00FFFF',
+          accent: '#FFD700',
+          background: '#0A0A0F',
+          surface: '#1A1A2F',
+        },
       },
       animation: {
         blob: "blob 7s infinite",
+        'neon-pulse': 'neon-pulse 2s ease-in-out infinite',
+        'neon-glow': 'neon-glow 1s ease-in-out infinite',
       },
       keyframes: {
         blob: {
@@ -48,8 +60,25 @@ export default {
             transform: "translate(0px, 0px) scale(1)",
           },
         },
+        'neon-pulse': {
+          '0%, 100%': { opacity: 1 },
+          '50%': { opacity: 0.5 },
+        },
+        'neon-glow': {
+          '0%, 100%': {
+            'box-shadow': '0 0 5px theme(colors.purple.400), 0 0 20px theme(colors.purple.600)',
+          },
+          '50%': {
+            'box-shadow': '0 0 10px theme(colors.purple.400), 0 0 30px theme(colors.purple.600)',
+          },
+        },
       },
     },
   },
   plugins: [],
-};
+  variants: {
+    extend: {
+      animation: ['hover', 'focus'],
+    },
+  },
+}
