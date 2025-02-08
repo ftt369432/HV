@@ -1,0 +1,25 @@
+.cyberpunk {
+  --neon-primary: theme(colors.purple.500);
+  --neon-secondary: theme(colors.pink.500);
+  --neon-accent: theme(colors.cyan.400);
+}
+
+.cyberpunk .neon-border {
+  box-shadow: 0 0 10px var(--neon-primary),
+              0 0 20px var(--neon-secondary);
+}
+
+.cyberpunk .neon-text {
+  text-shadow: 0 0 5px var(--neon-primary),
+               0 0 10px var(--neon-secondary);
+}
+
+.cyberpunk .neon-glow {
+  animation: neon-glow 2s ease-in-out infinite;
+}
+
+.cyberpunk .hover-neon:hover {
+  box-shadow: 0 0 15px var(--neon-primary),
+              0 0 30px var(--neon-secondary);
+  transition: box-shadow 0.3s ease-in-out;
+} 

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { PreferencesState } from '../types';
 
 export type DietaryRestriction = 
   | 'vegetarian'
@@ -30,46 +31,13 @@ export interface NutritionPreferences {
   };
 }
 
-interface PreferencesState {
-  preferences: NutritionPreferences;
-  isInitialized: boolean;
-  updatePreferences: (preferences: Partial<NutritionPreferences>) => void;
-  setInitialized: (value: boolean) => void;
-}
-
-const defaultPreferences: NutritionPreferences = {
-  dietaryRestrictions: [],
-  allergies: [],
-  dislikedIngredients: [],
-  preferredIngredients: [],
-  calorieGoal: 2000,
-  proteinGoal: 150,
-  carbGoal: 200,
-  fatGoal: 65,
-  mealTimes: {
-    breakfast: '08:00',
-    lunch: '12:00',
-    dinner: '18:00',
-    snack: '15:00'
-  },
-  intermittentFasting: {
-    enabled: false,
-    fastingWindow: 16,
-    eatingWindow: 8,
-    startTime: '20:00'
-  }
-};
-
 export const usePreferencesStore = create<PreferencesState>()(
   persist(
     (set) => ({
-      preferences: defaultPreferences,
       isInitialized: false,
-      updatePreferences: (newPreferences) =>
-        set((state) => ({
-          preferences: { ...state.preferences, ...newPreferences }
-        })),
-      setInitialized: (value) => set({ isInitialized: value })
+      preferences: {
+        calorieGoal: 2000
+      }
     }),
     {
       name: 'nutrition-preferences'
