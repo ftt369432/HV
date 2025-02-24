@@ -9,10 +9,10 @@ import { getPageBackground } from './utils/themeUtils';
 import { LoginPage, RegisterPage, ForgotPasswordPage } from './pages/auth';
 
 // Main Pages
-import { DashboardPage, SettingsPage } from './pages';
-import { MentalWellnessPage } from './features/mental/pages';
-import { SocialPage } from './features/social/pages';
-import { NutritionPage } from './features/nutrition/pages';
+import { Dashboard, Settings } from './pages';
+import { MentalWellness } from './pages/mental';
+import { SocialHub } from './pages/social';
+import { NutritionHub } from './pages/nutrition';
 
 // Layout
 import MainLayout from './components/layouts/MainLayout';
@@ -71,11 +71,11 @@ function AppContent() {
               }
             >
               <Route index element={<Navigate to="/dashboard" replace />} />
-              <Route path="dashboard" element={<DashboardPage />} />
-              <Route path="nutrition" element={<NutritionPage />} />
-              <Route path="mental-wellness" element={<MentalWellnessPage />} />
-              <Route path="social" element={<SocialPage />} />
-              <Route path="settings" element={<SettingsPage />} />
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="nutrition" element={<NutritionHub />} />
+              <Route path="mental-wellness" element={<MentalWellness />} />
+              <Route path="social" element={<SocialHub />} />
+              <Route path="settings" element={<Settings />} />
             </Route>
 
             {/* Catch all */}
